@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+
+<link href="asserts/css/style.css" rel="stylesheet" type="text/css" />
+<script language="JavaScript" src="js/jquery-1.12.4.min.js"></script>
+
+<script type="text/javascript">
+
+$(function(){
+
+	//导航切换
+	$(".menuson .header").click(function(){
+		var $parent = $(this).parent();
+		$(".menuson>li.active").not($parent).removeClass("active open").find('.sub-menus').hide();
+		$parent.addClass("active");
+
+		if(!!$(this).next('.sub-menus').size()){
+			if($parent.hasClass("open")){
+				$parent.removeClass("open").find('.sub-menus').hide();
+			}else{
+				$parent.addClass("open").find('.sub-menus').show();	
+			}
+		}
+
+	});
+
+	// 三级菜单点击
+	$('.sub-menus li').click(function(e) {
+        $(".sub-menus li.active").removeClass("active")
+		$(this).addClass("active");
+    });
+
+	$('.title').click(function(){
+		var $ul = $(this).next('ul');
+		$('dd').find('.menuson').slideUp();
+		if($ul.is(':visible')){
+			$(this).next('.menuson').slideUp();
+		}else{
+			$(this).next('.menuson').slideDown();
+		}
+	});
+
+})	
+</script>
+
+    <script>
+        $(function(){
+
+            //设置dropdown效果
+            $('.dropdown-toggle').dropdown();
+        });
+    </script>
+
+</head>
+
+<body style="background:white; margin-top: 20px">
+
+	<div class="lefttop"><span></span>系统功能</div>
+
+    <dl class="leftmenu">
+
+        <dd>
+            <div class="title">
+                <span><img src="asserts/images/leftico05.png" /></span>孕期知识
+            </div>
+            <ul class="menuson">
+                <li>
+                    <cite></cite><a href="knowledge/listByPage" target="content">知识查看</a><i></i>
+                </li>
+            </ul>
+
+        </dd>
+
+        <dd>
+            <div class="title">
+                <span><img src="asserts/images/leftico02.png" /></span>产检时间表
+            </div>
+            <ul class="menuson">
+                <li>
+                    <cite></cite><a href="pretime/listByPage"  target="content">查看时间表</a><i></i>
+                </li>
+            </ul>
+        </dd>
+
+        <dd>
+            <div class="title">
+                <span><img src="asserts/images/leftico07.png" /></span>宝宝状态
+            </div>
+            <ul class="menuson">
+                <li>
+                    <cite></cite><a href="prestatus/listByPage" target="content">孕周状态</a><i></i>
+                </li>
+            </ul>
+        </dd>
+
+        <dd>
+            <div class="title">
+                <span><img src="asserts/images/leftico01.png" /></span>饮食建议
+            </div>
+            <ul class="menuson">
+                <li><cite></cite><a href="food/listByPage?type=1" target="content">五谷杂粮</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=2"  target="content" >饮品饮料</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=3" target="content">水果</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=4" target="content">肉禽类</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=5" target="content">奶制品</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=6" target="content">水产海鲜</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=7" target="content">零食小吃</a><i></i></li>
+                <li ><cite></cite><a href="food/listByPage?type=8" target="content">蔬菜菌类</a><i></i></li>
+            </ul>
+        </dd>
+
+        <dd>
+            <div class="title">
+                <span><img src="asserts/images/leftico04.png" /></span>帖子管理
+            </div>
+            <ul class="menuson">
+                <li><cite></cite><a href="circle/listByPage" target="content">帖子</a><i></i></li>
+                <li><cite></cite><a href="circleComment/listByPage" target="content">评贴</a><i></i></li>
+                <li><cite></cite><a href="circleReply/listByPage" target="content">回贴</a><i></i></li>
+            </ul>
+        </dd>
+
+        <dd>
+            <div class="title">
+                <span><img src="asserts/images/leftico06.png" /></span>用户管理
+            </div>
+
+            <ul class="menuson">
+                <li><cite></cite><a href="babyWeight/listByPage" target="content">宝宝估重</a><i></i></li>
+                <li><cite></cite><a href="queryUser" target="content">宝妈信息</a><i></i></li>
+            </ul>
+        </dd>
+
+    </dl>
+</body>
+</html>

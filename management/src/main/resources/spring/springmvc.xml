@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.2.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+
+">
+    <!--定义组件扫描器   指定需要扫描的包com.neusoft  实现bean的自动载入
+    @Component（组件）@Service（服务层）@Controller（控制层）@Repository(数据库访问层)
+    -->
+    <context:component-scan base-package="com.wyyuand"/>
+
+    <!--开启注解驱动，让DateTimeFormat注解生效
+    会自动注册RequestMappingHandlerMapping与RequestMappingHandlerAdapter两个Bean
+    @NumberFormatannotation支持， @DateTimeFormat支持, @Valid支持读写XML的支持（JAXB）
+    和读写JSON的支持（默认Jackson）等功能
+    -->
+    <mvc:annotation-driven></mvc:annotation-driven>
+
+    <!--日期-->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.wyyuand.framework.DateConvert"></bean>
+            </set>
+        </property>
+    </bean>
+
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+    <!--配置数据源-->
+    <context:property-placeholder location="classpath:mybatis/jdbc.properties"></context:property-placeholder>
+
+
+
+
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+
+    <!--spring和MyBatis的完美融合,不需要mybatis的配置映射文件-->
+    <bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!--第二种：  2   Dao接口所在的包名，Spring会自动查找其下的类-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--set注入-->
+        <property name="basePackage" value="com.wyyuand.dao"></property>
+        <!--加载配置文件-->
+        <property name="sqlSessionFactoryBeanName" value="sessionFactory"></property>
+    </bean>
+
+
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+
+    <!--文件解析器-->
+    <!--multipart解析器  -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--默认编码-->
+        <property name="defaultEncoding" value="utf-8"></property>
+        <!--文件大小的最大值-->
+        <property name="maxUploadSize" value="300000000"></property>
+    </bean>
+
+
+
+
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="queryAll" propagation="SUPPORTS" read-only="true"/>
+            <tx:method name="save*" propagation="REQUIRED" no-rollback-for="java.lang.ArithmeticException"/>
+            <tx:method name="save*" propagation="REQUIRED"></tx:method>
+            <tx:method name="delete*" propagation="REQUIRED"></tx:method>
+            <tx:method name="update*" propagation="REQUIRED"></tx:method>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--配置事务的切面 AOP编程，利用切入点表达式从目标类方法发中确定增强的连接器，从而获得切入点-->
+    <aop:config>
+        <!--配置service层的切面-->
+        <aop:pointcut id="serviceOperation" expression="execution(* com.wyyuand.service.*.*(..))"/>
+        <!--应用事务的增强到service的切面-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="serviceOperation"/>
+    </aop:config>
+</beans>

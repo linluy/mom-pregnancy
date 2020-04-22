@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wyyuand.dao.KnowledgeMapperExt">
+
+  <!--<delete id="deleteAll"  parameterType="String">
+
+         delete from cereal where id in  (#{id})
+
+  </delete>
+    -->
+    <!--用户-->
+    <select id="queryExceptDate"  resultMap="com.wyyuand.dao.KnowledgeMapper.BaseResultMap">
+
+        select    id , title , content  , author , status , images
+        from t_knowledge
+    </select>
+
+    <!--管理员-->
+    <select id="queryAllCount"  resultType="int">
+       select count(*)
+       from t_knowledge
+    </select>
+
+    <select id="findByPage"  resultMap="com.wyyuand.dao.KnowledgeMapper.BaseResultMap">
+
+        select   *
+        from t_knowledge
+        limit #{0},#{1}
+    </select>
+
+    <delete id="deleteAll"  parameterType="java.lang.String">
+
+        delete
+        from t_knowledge
+        WHERE
+        id  in
+        <foreach collection="array" item="item" index="index" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+
+    </delete>
+    <!--管理员-->
+    <select id="queryAllByKeyCount"  parameterType="java.lang.String"  resultType="int">
+       select count(*)
+       from t_knowledge
+       where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND title LIKE CONCAT(CONCAT('%',#{keyword},'%'))
+        </if>
+    </select>
+
+    <select id="queryManyByPage"  resultMap="com.wyyuand.dao.KnowledgeMapper.BaseResultMap">
+
+        select
+          id,title,content,publishDate,author,status,images
+        from t_knowledge
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+             AND title LIKE CONCAT(CONCAT('%',#{0},'%'))
+        </if>
+        limit #{1},#{2}
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wyyuand.dao.UserMapperExt">
+
+    <select id="queryByEmail" parameterType="com.wyyuand.domain.User" resultMap="com.wyyuand.dao.UserMapper.BaseResultMap">
+-- user_creatTime  ,user_predate,user_birthday
+       SELECT  user_id,user_name,user_email,user_password,user_sex,user_status,user_pic,user_birthday,user_predate,baby_name,baby_pic
+       FROM  t_user
+      <where>
+          <if test="userEmail != null and userEmail != ''">
+              AND  user_email =  #{userEmail}
+          </if>
+          <if test="userPassword != null and userPassword != ''">
+              AND  user_password =  #{userPassword}
+          </if>
+      </where>
+  </select>
+
+    <!--根据邮箱更新 密码-->
+    <update id="updateByEmail" parameterType="com.wyyuand.domain.User">
+
+        update t_user
+        <set>
+            <if test="userPassword != null">
+                user_password = #{userPassword,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where user_email = #{userEmail,jdbcType=VARCHAR}
+    </update>
+
+    <select id="queryEmailUser" parameterType="com.wyyuand.domain.User" resultType="java.lang.Integer">
+
+        SELECT count(*)
+        FROM  t_user
+        <where>
+            <if test="userEmail != null and userEmail != ''">
+                AND  user_email =  #{userEmail}
+            </if>
+            <if test="userPassword != null and userPassword != ''">
+                AND  user_name =  #{userName}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateUser" parameterType="com.wyyuand.domain.User">
+        update t_user
+        <set>
+            <if test="record.userId != null">
+                user_id = #{record.userId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.userName != null">
+                user_name = #{record.userName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.userEmail != null">
+                user_email = #{record.userEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="record.userPassword != null">
+                user_password = #{record.userPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="record.userCreattime != null">
+                user_creatTime = #{record.userCreattime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.userSex != null">
+                user_sex = #{record.userSex,jdbcType=VARCHAR},
+            </if>
+            <if test="record.userPredate != null">
+                user_predate = #{record.userPredate,jdbcType=DATE},
+            </if>
+            <if test="record.userBirthday != null">
+                user_birthday = #{record.userBirthday,jdbcType=DATE},
+            </if>
+            <if test="record.userStatus != null">
+                user_status = #{record.userStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="record.userPic != null">
+                user_pic = #{record.userPic,jdbcType=VARCHAR},
+            </if>
+            <if test="record.babyName != null">
+                baby_name = #{record.babyName,jdbcType=VARCHAR},
+            </if>
+            <if test="record.babyPic != null">
+                baby_pic = #{record.babyPic,jdbcType=VARCHAR},
+            </if>
+        </set>
+    </update>
+
+
+    <!--
+    后台
+    -->
+
+    <!--管理员-->
+    <select id="queryAllCount"  resultType="int">
+       select count(*)
+       from t_user
+    </select>
+
+
+    <select id="findByPage"  resultMap="com.wyyuand.dao.UserMapper.BaseResultMap">
+
+        select   *
+        from t_user
+        limit #{0},#{1}
+    </select>
+
+    <!--管理员-->
+    <select id="queryAllByKeyCount"  parameterType="java.lang.String"  resultType="int">
+        select count(*)
+        from t_user
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND user_id LIKE CONCAT(CONCAT('%',#{keyword},'%'))
+        </if>
+    </select>
+
+    <select id="queryManyByPage"  resultMap="com.wyyuand.dao.UserMapper.BaseResultMap">
+
+        select
+        user_id,user_name,user_email,user_password,user_creatTime,user_sex,user_predate,user_birthday,user_status,user_pic,baby_name,baby_pic
+        from t_user
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND user_id LIKE CONCAT(CONCAT('%',#{0},'%'))
+        </if>
+        limit #{1},#{2}
+
+    </select>
+
+
+
+
+</mapper>

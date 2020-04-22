@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wyyuand.dao.CircleCommentMapperExt">
+
+    <!--association  1:1   collection：1：n-->
+    <resultMap type="com.wyyuand.domain.CircleComment" id="UserWithCircleCommentResult">
+
+        <id column="id" jdbcType="VARCHAR" property="id" />
+        <result column="circle_id" jdbcType="VARCHAR" property="circleId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+        <result column="user_logo" jdbcType="VARCHAR" property="userLogo" />
+        <result column="content" jdbcType="VARCHAR" property="content" />
+        <result column="reply_total" jdbcType="INTEGER" property="replyTotal" />
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+
+        <association property="user"  javaType="com.wyyuand.domain.User">
+            <id column="user_id" jdbcType="VARCHAR" property="userId" />
+            <result column="user_name" jdbcType="VARCHAR" property="userName" />
+            <result column="user_pic" jdbcType="VARCHAR" property="userPic" />
+        </association>
+
+    </resultMap>
+
+    <!--管理员-->
+    <select id="queryAllCount"  resultType="int">
+       select count(*)
+       from t_circle_comment
+    </select>
+
+    <select id="findByPage"  resultMap="UserWithCircleCommentResult">
+
+          select  c.*, u.user_name
+          from t_circle_comment c,t_user u
+          where c.user_id = u.user_id
+          ORDER BY create_date DESC
+          limit #{0},#{1}
+
+    </select>
+
+    <!--管理员-->
+    <select id="queryAllByKeyCount"  parameterType="java.lang.String"  resultType="int">
+        select count(*)
+        from t_circle_comment
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND content LIKE CONCAT(CONCAT('%',#{keyword},'%'))
+        </if>
+    </select>
+
+    <select id="queryManyByPage"  resultMap="UserWithCircleCommentResult">
+
+        select  c.*, u.user_name
+        from t_circle_comment c,t_user u
+        where c.user_id = u.user_id
+
+        <if test="_parameter != null and _parameter !=''">
+            AND content LIKE CONCAT(CONCAT('%',#{0},'%'))
+        </if>
+        ORDER BY create_date DESC
+        limit #{1},#{2}
+    </select>
+
+
+    <select id="selectCommentId"  resultMap="com.wyyuand.dao.CircleCommentMapper.BaseResultMap">
+
+        select  c.id
+        from t_circle_comment c
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND circle_id = #{id}
+        </if>
+    </select>
+
+
+    <delete id="deleteByCircleId"  parameterType="java.lang.String">
+        delete
+        from t_circle_comment
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND  circle_id  = #{id}
+        </if>
+    </delete>
+
+</mapper>

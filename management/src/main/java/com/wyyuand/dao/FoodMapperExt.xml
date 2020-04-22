@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wyyuand.dao.FoodMapperExt">
+
+  <delete id="deleteAll"  parameterType="java.lang.String">
+
+         delete
+              from t_food
+          WHERE
+               id  in
+          <foreach collection="array" item="item" index="index" open="("
+                   separator="," close=")">
+                 #{item}
+          </foreach>
+
+  </delete>
+
+
+    <select id="findByPage"  resultMap="com.wyyuand.dao.FoodMapper.BaseResultMap">
+
+        select   *
+        from t_food
+        where type=#{2}
+        limit #{0},#{1}
+    </select>
+
+    <select id="queryAllCount"  parameterType="String" resultType="int">
+       select count(*)
+       from t_food
+       where type=#{type}
+    </select>
+
+
+    <!--前端用户显示-->
+    <select id="queryAllByType"  parameterType="String" resultMap="com.wyyuand.dao.FoodMapper.BaseResultMap">
+       select id,  variety,  alias,  pw_j,  pw,  parturient_j,  parturient,  bfp_j,  bfp,  baby_j,  baby,  efficacy,  buy,  eating,  picture,  type,  status
+       from t_food
+       where 1=1 and status = '0'
+
+            <if test='_parameter == null or _parameter == ""'>
+               and pw_usually_eat = '1'
+                limit 0,30
+            </if>
+
+            <if test='_parameter != null and _parameter != ""'>
+               and type=#{type} ;
+            </if>
+
+    </select>
+
+
+
+
+    <!--前端用户显示-->
+    <select id="queryAllByWeekday"  parameterType="String" resultMap="com.wyyuand.dao.FoodMapper.BaseResultMap">
+
+        select id,  variety,  alias,  pw_j,  pw,  parturient_j,  parturient,  bfp_j,  bfp,  baby_j,  baby,  efficacy,  buy,  eating,  picture,  type,  status
+        from t_food
+        where 1=1 and status = '0'
+
+        <if test='_parameter == null or _parameter == ""'>
+            and pw_usually_eat = '1'
+            limit 0,30
+        </if>
+        <if test='_parameter != null and _parameter != ""'>
+            and pw_usually_eat = #{weekday}
+            limit 0,30
+        </if>
+
+    </select>
+
+
+    <!--管理员-->
+    <select id="queryAllByKeyCount"  resultType="int">
+        select count(*)
+        from t_food
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND variety LIKE CONCAT(CONCAT('%',#{0},'%'))
+        </if>
+        <if test="_parameter != null and _parameter !=''">
+            AND  type=#{1}
+        </if>
+    </select>
+
+    <select id="queryManyByPage"  resultMap="com.wyyuand.dao.FoodMapper.BaseResultMap">
+
+        select
+            id,variety,alias,pw_j,pw,parturient_j,parturient,bfp_j,bfp,baby_j,baby,efficacy,buy,eating,picture,updatetime,type,status,pw_usually_eat
+        from t_food
+
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND variety LIKE CONCAT(CONCAT('%',#{0},'%'))
+        </if>
+        <if test="_parameter != null and _parameter !=''">
+            AND  type=#{3}
+        </if>
+        limit #{1},#{2}
+
+    </select>
+
+
+
+
+
+
+
+</mapper>

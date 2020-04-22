@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wyyuand.dao.CircleMapperExt">
+
+    <!--association  1:1   collection：1：n-->
+    <resultMap type="com.wyyuand.domain.Circle" id="UserWithCircleResult">
+
+        <id column="circle_id" jdbcType="VARCHAR" property="circleId" />
+        <result column="user_id" jdbcType="VARCHAR" property="userId" />
+        <result column="circle_theme" jdbcType="VARCHAR" property="circleTheme" />
+        <result column="circle_content" jdbcType="VARCHAR" property="circleContent" />
+        <result column="circle_public_time" jdbcType="TIMESTAMP" property="circlePublicTime" />
+        <result column="fllow_num" jdbcType="INTEGER" property="fllowNum" />
+
+        <association property="user"  javaType="com.wyyuand.domain.User">
+            <id column="user_id" jdbcType="VARCHAR" property="userId" />
+            <result column="user_name" jdbcType="VARCHAR" property="userName" />
+            <result column="user_pic" jdbcType="VARCHAR" property="userPic" />
+        </association>
+    </resultMap>
+
+    <!--帖子 和 评论 是 1：n   -->
+    <resultMap type="com.wyyuand.domain.CircleComment" id="CommentWithCircleResult">
+
+            <id column="id" jdbcType="VARCHAR" property="id" />
+            <result column="circle_id" jdbcType="VARCHAR" property="circleId" />
+            <result column="user_id" jdbcType="VARCHAR" property="userId" />
+            <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+            <result column="user_logo" jdbcType="VARCHAR" property="userLogo" />
+            <result column="content" jdbcType="VARCHAR" property="content" />
+            <result column="reply_total" jdbcType="INTEGER" property="replyTotal" />
+            <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+                <!--评论 和 回复 是  1：n -->
+                <collection property="replyList" ofType="com.wyyuand.domain.CircleReply">
+
+                    <id column="reply_id" jdbcType="VARCHAR" property="replyId" />
+                    <result column="re_nick_name" jdbcType="VARCHAR" property="nickName" />
+                    <result column="comment_id" jdbcType="VARCHAR" property="commentId" />
+                    <result column="re_user_id" jdbcType="VARCHAR" property="userId" />
+                    <result column="re_content" jdbcType="VARCHAR" property="content" />
+                    <result column="re_status" jdbcType="VARCHAR" property="status" />
+                    <result column="re_create_date" jdbcType="TIMESTAMP" property="createDate" />
+                    <result column="re_user_logo" jdbcType="VARCHAR" property="userLogo" />
+                </collection>
+
+        </resultMap>
+
+    <select id="findUserWithCircle" resultMap="UserWithCircleResult">
+
+            select  c.*,  u.user_id, u.user_name, u.user_pic
+            from t_circle c,t_user u
+            where c.user_id = u.user_id
+            ORDER BY circle_public_time DESC
+    </select>
+
+    <select id="findCommentWithCircle" resultMap="CommentWithCircleResult">
+
+                   SELECT
+                      c.id,c.circle_id,c.user_id,c.nick_name,c.user_logo,c.content,c.reply_total,c.create_date,
+                      r.reply_id,
+                      r.nick_name "re_nick_name",
+                      r.comment_id,r.user_id "re_user_id",
+                      r.content "re_content",
+                      r.status "re_status",
+                      r.create_date "re_create_date",
+                      r.user_logo "re_user_logo"
+                   FROM
+                      t_circle_comment c
+                      LEFT JOIN t_user t ON  c.user_id = t.user_id
+                      LEFT JOIN t_circle_reply r  ON  c.id = r.comment_id
+                      WHERE  c.circle_id =  #{circleId}
+                      ORDER BY c.create_date ASC
+
+    </select>
+
+    <select id="findCommentCount" parameterType="String" resultType="Integer">
+
+        SELECT
+            COUNT(*)
+        FROM
+          t_circle_comment
+
+        WHERE circle_id = #{circleId}
+
+    </select>
+
+    <!--
+
+        管理员
+    -->
+    <select id="queryAllCount"  resultType="int">
+       select count(*)
+       from t_circle
+    </select>
+
+    <select id="findByPage"  resultMap="UserWithCircleResult">
+
+          select  c.*, u.user_name
+          from t_circle c,t_user u
+          where c.user_id = u.user_id
+          ORDER BY circle_public_time DESC
+          limit #{0},#{1}
+    </select>
+
+ <!--   <select id="queryAllCountComment"  resultType="int">
+       select count(*)
+       from t_circle_comment
+    </select>
+-->
+    <!--管理员-->
+    <select id="queryAllByKeyCount"  parameterType="java.lang.String"  resultType="int">
+        select count(*)
+        from t_circle
+        where 1=1
+        <if test="_parameter != null and _parameter !=''">
+            AND circle_content LIKE CONCAT(CONCAT('%',#{keyword},'%'))
+        </if>
+    </select>
+
+    <select id="queryManyByPage"  resultMap="UserWithCircleResult">
+
+        select
+             circle_id,c.user_id,circle_theme,circle_content,circle_public_time,fllow_num,
+              u.user_name
+        from t_circle c,t_user u
+        where c.user_id = u.user_id
+        <if test="_parameter != null and _parameter !=''">
+            AND circle_content LIKE CONCAT(CONCAT('%',#{0},'%'))
+        </if>
+        ORDER BY circle_public_time DESC
+        limit #{1},#{2}
+    </select>
+
+</mapper>

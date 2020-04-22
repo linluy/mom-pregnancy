@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!--配置编码-->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceRequestEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceResponseEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--
+    前端控制器
+     ServletConfig中的一个方法用来初始化参数的信息
+     Spring view分发器   对所有的请求都由 spring 对应的类来控制转发
+      ContextLoaderListener初始化的上下文加载的Bean是对于整个应用程序共享的，一般如：
+      DAO层、Service层Bean；
+
+     DispatcherServlet初始化的上下文加载的Bean是只对Spring MVC有效的Bean，
+     如：Controller、HandlerMapping、HandlerAdapter等，该初始化上下文只加载Web相关组件
+      -->
+    <servlet>
+        <servlet-name>spring</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--配置1个初始化参数(可以配置多个)
+          配置Spring MVC，指定处理请求的Servlet：
+        一种默认，在/WEB-INF/${servletName}-servlet.xml   /WEB-INF/spring-servlet.xml
+        一种配置：<init-param>    src/main/resources(固定)/spring/springmvc.xml
+        -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <!--classpath是web项目的类路径，可以理解为classes下面-->
+            <param-value>classpath:spring/springmvc.xml</param-value>
+        </init-param>
+
+        <!--大于等于0  ：标记容器在应用启动的时候就加载这个servlet  正数的值越小，表示优先级越高
+        负数：标记容器在该servlet被选择使才加载
+        -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!--
+        容器先会将请求的url减去当前应用上下文的路径作为  servlet的映射url
+         filter，不会像servlet那样只匹配一个servlet，
+         因为filter的集合是一个链，所以只会有处理的顺序不同，而不会出现只选择一个filter。
+         Filter的处理顺序和 filter-mapping在web.xml中定义的顺序相同。
+     -->
+    <servlet-mapping>
+        <servlet-name>spring</servlet-name>
+        <url-pattern>/</url-pattern>
+        <!--<url-pattern>*.action</url-pattern>-->
+    </servlet-mapping>
+
+</web-app>
